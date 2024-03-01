@@ -54,6 +54,43 @@ class LMMBaseModel(ABC):
         return self.predict(input_text, **kwargs)
 
 
+class Arithmephi(PhiModel):
+    """
+    Language model class for the Arithmephi model.
+
+    Inherits from LMMBaseModel and sets up the Arithmephi language model for use.
+
+    Parameters:
+    -----------
+    model : str
+        The name of the Arithmephi model.
+    max_new_tokens : int
+        The maximum number of new tokens to be generated.
+    temperature : float, optional
+        The temperature for text generation (default is 0).
+    device: str
+        The device to use for inference (default is 'auto').
+
+    Methods:
+    --------
+    predict(input_text, **kwargs)
+        Generates a prediction based on the input text.
+    """
+    def __init__(self, model_name, max_new_tokens, temperature, device, dtype):
+        super(Arithmephi, self).__init__(model_name, max_new_tokens, temperature, device)
+
+        self.model_name = "chuckfinca/arithmephi"
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=dtype, device_map='auto', trust_remote_code=True)
+
+        # Setting up the tokenizer for Phi-2
+        self.tokenizer_name = "microsoft/phi-2"
+        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, torch_dtype=dtype, add_eos_token=True, trust_remote_code=True)
+        self.tokenizer.pad_token = tokenizer.eos_token
+        self.tokenizer.truncation_side = "left"
+
+        self.temperature = temperature
+
+
 class BaichuanModel(LMMBaseModel):
     """
     Language model class for the Baichuan model.
